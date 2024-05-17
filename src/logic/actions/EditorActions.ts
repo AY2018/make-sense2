@@ -46,6 +46,7 @@ export class EditorActions {
                 break;
         }
     };
+    
 
     public static swapSupportRenderingEngine(activeLabelType: LabelType) {
         EditorActions.mountSupportRenderingEngine(activeLabelType);

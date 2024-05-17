@@ -49,7 +49,7 @@ export class PolygonRenderEngine extends BaseRenderEngine {
     // =================================================================================================================
 
     public update(data: EditorData): void {
-        if (!!data.event) {
+        if (!!data.event && data.event instanceof MouseEvent) {
             switch (MouseEventUtil.getEventType(data.event)) {
                 case EventType.MOUSE_MOVE:
                     this.mouseMoveHandler(data);
@@ -69,12 +69,21 @@ export class PolygonRenderEngine extends BaseRenderEngine {
     public mouseDownHandler(data: EditorData): void {
         const isMouseOverCanvas: boolean = RenderEngineUtil.isMouseOverCanvas(data);
         if (isMouseOverCanvas) {
+            const event = data.event as MouseEvent;
+            if (event.button === 2) {  // Right-click detected
+                const pointToRemove = this.getAnchorUnderMouse(data);
+                if (pointToRemove) {
+                    this.deletePointFromPolygon(data, pointToRemove);
+                    console.log("Point to remove:", pointToRemove);
+                }
+                return;
+            }
             if (this.isCreationInProgress()) {
                 const isMouseOverStartAnchor: boolean = this.isMouseOverAnchor(
                     data.mousePositionOnViewPortContent, this.activePath[0]);
                 if (isMouseOverStartAnchor) {
                     this.addLabelAndFinishCreation(data);
-                } else  {
+                } else {
                     this.updateActivelyCreatedLabel(data);
                 }
             } else {
@@ -82,14 +91,14 @@ export class PolygonRenderEngine extends BaseRenderEngine {
                 if (!!polygonUnderMouse) {
                     const anchorIndex: number = polygonUnderMouse.vertices.reduce(
                         (indexUnderMouse: number, anchor: IPoint, index: number) => {
-                        if (indexUnderMouse === null) {
-                            const anchorOnCanvas: IPoint = RenderEngineUtil.transferPointFromImageToViewPortContent(anchor, data);
-                            if (this.isMouseOverAnchor(data.mousePositionOnViewPortContent, anchorOnCanvas)) {
-                                return index;
+                            if (indexUnderMouse === null) {
+                                const anchorOnCanvas: IPoint = RenderEngineUtil.transferPointFromImageToViewPortContent(anchor, data);
+                                if (this.isMouseOverAnchor(data.mousePositionOnViewPortContent, anchorOnCanvas)) {
+                                    return index;
+                                }
                             }
-                        }
-                        return indexUnderMouse;
-                    }, null);
+                            return indexUnderMouse;
+                        }, null);
 
                     if (anchorIndex !== null) {
                         this.startExistingLabelResize(data, polygonUnderMouse.id, anchorIndex);
@@ -106,6 +115,58 @@ export class PolygonRenderEngine extends BaseRenderEngine {
             }
         }
     }
+
+    private deletePointFromPolygon(data: EditorData, pointToRemove: IPoint): void {
+    const imageData: ImageData = LabelsSelector.getActiveImageData();
+    const activeLabel: LabelPolygon = LabelsSelector.getActivePolygonLabel();
+
+    if (!activeLabel) return;
+
+    // Transform the point to remove to canvas coordinates
+    const transformedPointToRemove = RenderEngineUtil.transferPointFromViewPortContentToImage(pointToRemove, data);
+
+    console.log("Original vertices:", activeLabel.vertices);
+    console.log("Point to remove (transformed):", transformedPointToRemove);
+
+    const updatedVertices = activeLabel.vertices.filter(point => !this.arePointsEqual(point, transformedPointToRemove));
+    console.log("Filtered vertices:", updatedVertices);
+
+    if (updatedVertices.length < 3) {
+        console.warn("A polygon must have at least 3 points.");
+        return;
+    }
+
+    const updatedPolygons = imageData.labelPolygons.map((polygon: LabelPolygon) => {
+        if (polygon.id !== activeLabel.id) return polygon;
+        return {
+            ...polygon,
+            vertices: updatedVertices
+        };
+    });
+
+    const newImageData = {
+        ...imageData,
+        labelPolygons: updatedPolygons
+    };
+
+    console.log("Updated image data:", newImageData);
+    store.dispatch(updateImageDataById(newImageData.id, newImageData));
+    store.dispatch(updateActiveLabelId(activeLabel.id));
+}
+
+// Utility function to compare points with a tolerance for floating-point precision
+private arePointsEqual(point1: IPoint, point2: IPoint): boolean {
+    const threshold = 0.1; // Adjust this threshold if needed
+    const xEqual = Math.abs(point1.x - point2.x) < threshold;
+    const yEqual = Math.abs(point1.y - point2.y) < threshold;
+    console.log(`Comparing points: (${point1.x}, ${point1.y}) with (${point2.x}, ${point2.y}) -> xEqual: ${xEqual}, yEqual: ${yEqual}`);
+    return xEqual && yEqual;
+}
+
+
+
+
+
 
     public mouseUpHandler(data: EditorData): void {
         if (this.isResizeInProgress())

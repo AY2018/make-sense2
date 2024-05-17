@@ -240,9 +240,9 @@ class Editor extends React.Component<IProps, IState> {
                     >
                         <canvas
                             className='ImageCanvas'
-                            ref={ref => EditorModel.canvas = ref}
-                            draggable={false}
-                            onContextMenu={(event: React.MouseEvent<HTMLCanvasElement>) => event.preventDefault()}
+    ref={ref => EditorModel.canvas = ref}
+    draggable={false}
+    onContextMenu={(event: React.MouseEvent<HTMLCanvasElement>) => event.preventDefault()}
                         />
                         {this.getOptionsPanels()}
                     </div>

@@ -7,3 +7,4 @@ export class EnvironmentUtil {
         return process.env.NODE_ENV === 'production';
     }
 }
+
