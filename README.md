@@ -5,6 +5,17 @@
 
 ## 💻 Local Setup
 
+#### First, install Node
+
+The latest version should work, but here are my versions in case it doesn't work : 
+```bash
+node -v
+v22.2.0
+
+npm -v
+10.7.0
+```
+
 ```bash
 # clone repository
 git clone https://github.com/SkalskiP/make-sense.git
@@ -18,4 +29,3 @@ npm install
 # serve with hot reload at localhost:3000
 npm start
 ```
-To ensure proper functionality of the application locally, npm `8.x.x` and node.js `v16.x.x` versions are required. More information about this problem is available in the [#16][4].
