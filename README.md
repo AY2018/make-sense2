@@ -1,4 +1,4 @@
-[Link : Preparation of the dataset](https://github.com/AY2018/Final_DL2)
+[Link : Preparation of the dataset](https://youtu.be/Q0_71RbMWao)
 
 
 
@@ -7,7 +7,7 @@
 
 #### First, install Node
 
-The latest version should work, but here are my versions in case it doesn't work : 
+The latest version should work, but here are my versions in case it doesn't : 
 ```bash
 node -v
 v22.2.0
@@ -18,10 +18,10 @@ npm -v
 
 ```bash
 # clone repository
-git clone https://github.com/SkalskiP/make-sense.git
+git clone https://github.com/AY2018/make-sense2.git
 
 # navigate to main dir
-cd make-sense
+cd make-sense2
 
 # install dependencies
 npm install
