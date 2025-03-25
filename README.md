@@ -10,10 +10,10 @@
 The latest version should work, but here are my versions in case it doesn't : 
 ```bash
 node -v
-v22.2.0
+v22.14.0
 
 npm -v
-10.7.0
+10.9.2
 ```
 
 ```bash
